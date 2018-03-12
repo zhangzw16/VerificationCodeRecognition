@@ -56,7 +56,7 @@ def create_code():
     height = 60
     image = Image.new('RGB', (width, height), (192, 192, 192))
     # 创建Font对象:
-    font = ImageFont.truetype('CAMBRIA.TTC', 36)
+    font = ImageFont.truetype('CAMBRIA.TTC', 44)
 
     # 创建Draw对象:
     draw = ImageDraw.Draw(image)
@@ -74,7 +74,7 @@ def create_code():
         _str = "{}{}".format(_str, c)
 
         # 随机距离图片上边高度，但至少距离30像素
-        h = random.randint(1, height-30)
+        h = random.randint(1, height-50)
         # 宽度的化，每个字符占图片宽度1／4,在加上10个像素空隙
         w = width/4 * t + 10
         draw.text((w, h), c, font=font, fill=rnd_color2())
