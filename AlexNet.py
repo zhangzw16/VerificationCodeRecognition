@@ -7,7 +7,6 @@ from keras.preprocessing import image
 from keras.utils import layer_utils
 from keras.utils.data_utils import get_file
 from keras.applications.imagenet_utils import preprocess_input
-import pydot
 from keras.utils.vis_utils import model_to_dot
 from keras.utils import plot_model
 from utils import *
@@ -76,6 +75,7 @@ def HappyModel(input_shape):
 
 happyModel = HappyModel((64,64,3))
 
+# 需要修改loss_function
 happyModel.compile(optimizer='adam', loss="binary_crossentropy", metrics=['accuracy'])
 
 happyModel.fit(x=X_train, y=Y_train, epochs=10, batch_size=20)

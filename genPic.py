@@ -1,9 +1,13 @@
 #!/usr/bin/python
 #-*-coding:utf-8-*-
-from uuid import uuid1
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
 import random
 import sys
+# from uuid import uuid1
+
+import h5py
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
+import numpy as np
+
 def rnd_char():
     '''
     随机一个字母或者数字
@@ -50,13 +54,13 @@ def rnd_color2():
       '''
     return (random.randint(32, 127), random.randint(32, 127), random.randint(32, 127))
 
-def create_code():
+def create_code(code_list):
     # 240 x 60:
     width = 60 * 4
     height = 60
     image = Image.new('RGB', (width, height), (192, 192, 192))
     # 创建Font对象:
-    font = ImageFont.truetype('CAMBRIA.TTC', 44)
+    font = ImageFont.truetype('fonts/CAMBRIA.TTC', 44)
 
     # 创建Draw对象:
     draw = ImageDraw.Draw(image)
@@ -94,15 +98,23 @@ def create_code():
         # draw.text((w, h), dis, fill=rnd_color())
 
     # 模糊:
-
     image.filter(ImageFilter.BLUR)
 
+    code_list.append(_str)
     # uuid1 生成唯一的字符串作为验证码图片名称
-    code_name = '{}.jpg'.format(uuid1())
-    save_dir = './{}'.format(code_name)
+    # code_name = '{}.jpg'.format(uuid1())
+    code_name = '{}.jpg'.format(_str)
+    save_dir = './images/{}'.format(code_name)
     image.save(save_dir, 'jpeg')
     print("已保存图片: {}".format(save_dir))
 
 # 当直接运行文件的是和，运行下面代码
 if __name__ == "__main__":
-    create_code()
+    code_list = []
+    for i in range(20):
+        create_code(code_list)
+    f = h5py.File("datasets/codes.hdf5","w")
+    code_list_asc = []
+    for i in code_list:
+        code_list_asc.append(i.encode())
+    d1 = f.create_dataset('codename', data=code_list_asc)
