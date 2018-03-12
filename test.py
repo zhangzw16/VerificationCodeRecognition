@@ -13,4 +13,3 @@ dset_image = f['images']
 img = dset_image.value[0]
 img = Image.fromarray(img)
 img.show()
-print(img)
