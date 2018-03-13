@@ -15,6 +15,11 @@ from keras.utils.vis_utils import model_to_dot
 from matplotlib.pyplot import imshow
 from utils import *
 
+import string
+characters = string.digits + string.ascii_uppercase
+print(characters)
+n_class, n_len = len(characters), 4 #一共36个字符，每个验证码4个字符
+
 K.set_image_data_format('channels_last')
 
 # X_train_orig, Y_train_orig, X_test_orig, Y_test_orig, classes = load_datasets()
@@ -34,6 +39,16 @@ print ("X_train shape: " + str(X_train.shape))
 print ("Y_train shape: " + str(Y_train.shape))
 # print ("X_test shape: " + str(X_test.shape))
 # print ("Y_test shape: " + str(Y_test.shape))
+
+Y = [np.zeros((Y_train.shape[0], n_class), dtype=np.uint8) for i in range(n_len)]
+for i, y in enumerate(Y_train):
+    y = y.decode()
+    for j, ch in enumerate(y):
+        print(y)
+        # y[j][i, :] = 0
+        Y[j][i, characters.find(ch)] = 1
+        # Y[i][j, characters.find(ch)] = 1
+print(Y)
 
 def HappyModel(input_shape):
     """
@@ -75,13 +90,36 @@ def HappyModel(input_shape):
     
     return model
 
-happyModel = HappyModel((64,64,3))
+def CNNModel(input_shape):
+    X_input = Input(input_shape)
+    x = X_input
+    # for i in range(4):
+    #     x = ZeroPadding2D((1,1))
+    #     x = Conv2D(32*2**i, (3, 3), activation='relu')(x)
+    #     x = Conv2D(32*2**i, (3, 3), activation='relu')(x)
+    #     x = MaxPooling2D((2, 2))(x)
+    x = ZeroPadding2D((1,1))(x)
+    x = Conv2D(32, (3,3), activation='relu', name='conv0')(x)
+    
+
+    x = Flatten()(x)
+    x = Dropout(0.25)(x)
+    x = [Dense(n_class, activation='softmax', name='c%d'%(i+1))(x) for i in range(4)]
+    model = Model(inputs=X_input, outputs=x, name="CNNModel")
+    return model
+
+# happyModel = HappyModel((64,64,3))
+cnnModel = CNNModel((60, 240, 3))
 
 # 需要修改loss_function
-happyModel.compile(optimizer='adam', loss="binary_crossentropy", metrics=['accuracy'])
+# happyModel.compile(optimizer='adam', loss="binary_crossentropy", metrics=['accuracy'])
+cnnModel.compile(loss='categorical_crossentropy',
+              optimizer='adadelta',
+              metrics=['accuracy'])
 # categorical_crossentropy
 
-happyModel.fit(x=X_train, y=Y_train, epochs=10, batch_size=20)
+# happyModel.fit(x=X_train, y=Y_train, epochs=10, batch_size=20)
+cnnModel.fit(x=X_train, y=Y, epochs=20)
 
 # preds = happyModel.evaluate(x=X_test, y=Y_test,)
 
@@ -89,4 +127,4 @@ print()
 # print ("Loss = " + str(preds[0]))
 # print ("Test Accuracy = " + str(preds[1]))
 
-happyModel.summary()
+# happyModel.summary()
