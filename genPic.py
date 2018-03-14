@@ -111,10 +111,21 @@ def create_code(code_list):
 # 当直接运行文件的是和，运行下面代码
 if __name__ == "__main__":
     code_list = []
-    for i in range(20):
+    for i in range(100):
         create_code(code_list)
     f = h5py.File("datasets/codes.hdf5","w")
     code_list_asc = []
     for i in code_list:
         code_list_asc.append(i.encode())
-    d1 = f.create_dataset('codename', data=code_list_asc)
+    d1 = f.create_dataset('train_codename', data=code_list_asc)
+
+    code_list = []
+    for i in range(30):
+        create_code(code_list)
+    # f = h5py.File("datasets/codes.hdf5","w")
+    code_list_asc = []
+    for i in code_list:
+        code_list_asc.append(i.encode())
+    d1 = f.create_dataset('test_codename', data=code_list_asc)
+
+    
